@@ -1,3 +1,9 @@
+def load_clip(clip_model_name = "ViT-B-32-quickgelu", pretrained="laion400m_e32"):
+    import open_clip
+    model, _, preprocess = open_clip.create_model_and_transforms(clip_model_name, pretrained)
+    tokenizer = open_clip.get_tokenizer(clip_model_name)
+    return model, preprocess, tokenizer
+
 def imagenet_labels():
     # can't stop me can you :^)
     # from https://github.com/anishathalye/imagenet-simple-labels/blob/master/imagenet-simple-labels.json
