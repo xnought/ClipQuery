@@ -6,5 +6,6 @@ An interface to query CLIP models easily.
 
 -   [x] Get Dummy data (mix of metdata and (images or text))
 -   [x] Get CLIP inference working
--   [ ] Given text input, CLIP inference and store results
+-   [x] Given text, compute CLIP scores
+-   [ ] Store embeddings in db
 -   [ ] adapt to sql like queries

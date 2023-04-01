@@ -2,3 +2,4 @@ torch
 torchvision
 pandas
 open_clip_torch
+pyarrow
