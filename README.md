@@ -26,20 +26,20 @@ Check out [`example.ipynb`](example.ipynb) for a walkthrough usecase using image
 
 The code is 100 lines! Cmon, are you this lazy? Check out [`clip_query.py`](clip_query.py) for the code.
 
-## Future
+## In the works
 
 -   [ ] add support for many text queries (i.e., classification task)
--   [ ] Have a standard SQL API so you can do complex querying with CLIP and your data.
+-   [ ] Have a standard SQL API so you can do complex querying with CLIP and your own data.
 
-for example it would be nice to do this
+for example it would be nice to simply declare what you want!
 
 ```python
 SELECT *, clip(image_column, "a puppy in the snow") as score FROM table
-WHERE score > 0.5 AND label = 'dog' AND prediction = 'cat'
+WHERE score > 0.8 AND label = 'dog' AND prediction = 'cat'
 ORDER BY score DESC
 LIMIT 25
 ```
 
-This interface allows for conceptual querying (what's in the image) and what info we do have. This would be nice to create hypotheses for poor ML model behavior.
+This interface allows for conceptual querying (what's in the image) and other available data. It's like declarying that you want entries where the image has a puppy in the snow, true label is dog, but is misclassified as cat.
 
 Hopefully I can do this with some combination of CLIP, [DuckDB](https://duckdb.org/), and [SQL-Parse](https://sqlparse.readthedocs.io/en/latest/).
