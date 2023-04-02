@@ -19,6 +19,9 @@ scores = cq.query(images, "a picture of a dog")
 
 ClipQuery will automagically (I have sinned) detect GPU and use it if available.
 
+**Example**
+Check out [`example.ipynb`](example.ipynb) for a walkthrough usecase using imagenette image data.
+
 ## Docs
 
 The code is 100 lines. Its probably better you read it the code rather than from me. Check out [`clip_query.py`](clip_query.py) for the code.
