@@ -24,7 +24,7 @@ Check out [`example.ipynb`](example.ipynb) for a walkthrough usecase using image
 
 ## Docs
 
-The code is 100 lines. Its probably better you read it the code rather than from me. Check out [`clip_query.py`](clip_query.py) for the code.
+The code is 100 lines! Cmon, are you this lazy? Check out [`clip_query.py`](clip_query.py) for the code.
 
 ## Future
 
