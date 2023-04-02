@@ -2,10 +2,8 @@ import pandas as pd
 import os
 import torch
 from PIL import Image
-from functools import lru_cache
 
 
-@lru_cache(maxsize=1)
 def load_clip(clip_model_name="ViT-B-32-quickgelu", pretrained="laion400m_e32"):
     import open_clip
 
