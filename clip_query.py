@@ -1,9 +1,8 @@
-import pandas as pd
+from __future__ import annotations
 import os
 import torch
 from PIL import Image
 import open_clip
-import numpy as np
 from tqdm import tqdm
 
 
@@ -24,11 +23,6 @@ def flatten(l, depth=1):
 
     _flatten(l, depth)
     return flat
-
-
-def series_to_tensor(df: pd.Series, dtype=torch.float32):
-    # UserWarning: Creating a tensor from a list of numpy.ndarrays is extremely slow. Please consider converting the list to a single numpy.ndarray with numpy.array() before converting to a tensor. (Triggered internally at /Users/runner/work/pytorch/pytorch/pytorch/torch/csrc/utils/tensor_new.cpp:248.)
-    return torch.tensor(np.array(df.tolist()), dtype=dtype)
 
 
 class ClipQuery:
@@ -55,50 +49,50 @@ class ClipQuery:
         self.tokenizer = open_clip.get_tokenizer(clip_model_name)
 
     @torch.no_grad()
-    def encode_images(
-        self, base_path: str, image_paths: pd.Series, batch_size=32
-    ) -> pd.Series:
-        """
-        encodes via CLIP then adds to the dataframe as a new column
-        Returns image encodings used in the query step, you can save this in your df or not
-        """
-
+    def encode_images(self, image_paths: list[str], base_path: str = "", batch_size=32):
         batches = []
         for batch in tqdm(
             batch_size_iter(image_paths, batch_size),
             total=len(image_paths) // batch_size,
         ):
-            preprocessed_images: list[torch.Tensor] = (
-                batch.apply(lambda x: Image.open(os.path.join(base_path, x)))
-                .apply(lambda x: self.preprocess(x).unsqueeze(0))
-                .tolist()
-            )
+            preprocessed_images: list[torch.Tensor] = [
+                self.preprocess(Image.open(os.path.join(base_path, x))).unsqueeze(0)
+                for x in batch
+            ]
             # [batch, 3, 224, 224] where batch is the number of images in the batch
             # in this case, each image is 3x224x224 sized
             images_tensor = torch.cat(preprocessed_images, dim=0).to(self.device)
             image_features = self.model.encode_image(images_tensor)
             batches.append(image_features.detach().cpu().tolist())
-
-        return pd.Series(flatten(batches, depth=1))
+        return flatten(batches, depth=1)
 
     @torch.no_grad()
     @torch.cuda.amp.autocast()
-    def query(self, image_encodings: pd.Series, text: str, normalize=True) -> pd.Series:
+    def query(
+        self,
+        image_encodings: list[list[float]],
+        text: str,
+        normalize=True,
+        batch_size=32,
+    ):
         # encode the text in CLIP space
         tokens = self.tokenizer([text]).to(self.device)
         text_encoding = self.model.encode_text(tokens)
-        # images are already encoded in CLIP space
-        images_encoding = series_to_tensor(image_encodings, dtype=torch.float32).to(
-            self.device
-        )
-        # compute scores for each image
-        clip_scores = (
-            images_encoding @ text_encoding.T
-        )  # shapes: [n, vector_size] @ [vector_size, 1] = [n, 1]
-        if normalize is True:
-            clip_scores = clip_scores / torch.norm(clip_scores, dim=0, keepdim=True)
-        return pd.Series(clip_scores.squeeze().detach().cpu().tolist())
+        batches = []
+        for batch in tqdm(
+            batch_size_iter(image_encodings, batch_size),
+            total=len(image_encodings) // batch_size,
+        ):
+            # images are already encoded in CLIP space
+            images_encoding = torch.tensor(batch, dtype=torch.float32).to(self.device)
+            # compute scores for each image
+            clip_scores = (
+                images_encoding @ text_encoding.T
+            )  # shapes: [n, vector_size] @ [vector_size, 1] = [n, 1]
+            if normalize is True:
+                clip_scores = clip_scores / torch.norm(clip_scores, dim=0, keepdim=True)
+            batches.append(clip_scores.squeeze().detach().cpu().tolist())
+        return flatten(batches, depth=1)
 
-
-if __name__ == "__main__":
-    pass
+    def __repr__(self):
+        return f"ClipQuery(device={self.device}, model={self.model})"
