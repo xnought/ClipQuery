@@ -22,6 +22,39 @@ ClipQuery will automagically (I have sinned) detect GPU and use it if available.
 **Example**
 Check out [`example.ipynb`](example.ipynb) for a walkthrough usecase using imagenette image data.
 
+## Experimental: Clip Query Language -> CQL
+
+Check out [`cql_example.ipynb`](cql_example.ipynb) for a walkthrough usecase using imagenette image data.
+
+given your data frame `df`
+
+```python
+cql = CQL(df)
+df["image_encoding"] = cql.encode_images(df["id"], base_path="./data/imagenette")
+```
+
+Query concepts in the data directly with a SQL syntax and the `clip` function
+
+```SQL
+SELECT *, clip(image_encoding, 'a picture of cute puppy dogs') as puppy_concept FROM df
+WHERE label = 'English Springer Spaniel'
+ORDER BY puppy_concept DESC
+```
+
+in python,
+
+```python
+puppy_springer_spaniels = cql(
+    """SELECT *, clip(image_encoding, 'a picture of cute puppy dogs') as puppy_concept FROM df
+       WHERE label = 'English Springer Spaniel'
+       ORDER BY puppy_concept DESC
+    """
+)
+```
+
+displaying the top result -> 
+![download](https://user-images.githubusercontent.com/65095341/229401832-79dc9a5e-6044-4818-ae48-430565ec307a.png)
+
 ## Docs
 
 The code is 100 lines! Cmon, are you this lazy? Check out [`clip_query.py`](clip_query.py) for the code.
@@ -29,17 +62,4 @@ The code is 100 lines! Cmon, are you this lazy? Check out [`clip_query.py`](clip
 ## In the works
 
 -   [ ] add support for many text queries (i.e., classification task)
--   [ ] Have a standard SQL API so you can do complex querying with CLIP and your own data.
-
-for example it would be nice to simply declare what you want!
-
-```python
-SELECT *, clip(image_column, "a puppy in the snow") as score FROM table
-WHERE score > 0.8 AND label = 'dog' AND prediction = 'cat'
-ORDER BY score DESC
-LIMIT 25
-```
-
-This interface allows for conceptual querying (what's in the image) and other available data. It's like declarying that you want entries where the image has a puppy in the snow, true label is dog, but is misclassified as cat.
-
-Hopefully I can do this with some combination of CLIP, [DuckDB](https://duckdb.org/), and [SQL-Parse](https://sqlparse.readthedocs.io/en/latest/).
+-   [x] Have a standard SQL API so you can do complex querying with CLIP and your own data.
