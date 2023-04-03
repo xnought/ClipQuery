@@ -72,7 +72,7 @@ class ClipQuery:
         self,
         image_encodings: list[list[float]],
         text: str,
-        normalize=True,
+        normalize=False,
         batch_size=32,
     ):
         # encode the text in CLIP space
