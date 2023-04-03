@@ -26,14 +26,14 @@ Check out [`example.ipynb`](example.ipynb) for a walkthrough usecase using image
 
 Check out [`cql_example.ipynb`](cql_example.ipynb) for a walkthrough usecase using imagenette image data.
 
-given your data frame `df`
+given your data frame `df`, add another column `image_encoding`
 
 ```python
 cql = CQL(df)
 df["image_encoding"] = cql.encode_images(df["id"], base_path="./data/imagenette")
 ```
 
-Query concepts in the `df` dataframe by name directly with SQL syntax and the `clip` function
+Query concepts in the `df` dataframe by name directly with SQL syntax and the `clip` function. See that we also reference the `image_encoding` column.
 
 ```SQL
 SELECT *, clip(image_encoding, 'a picture of cute puppy dogs') as puppy_concept FROM df
