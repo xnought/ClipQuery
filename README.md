@@ -33,7 +33,7 @@ cql = CQL(df)
 df["image_encoding"] = cql.encode_images(df["id"], base_path="./data/imagenette")
 ```
 
-Query concepts in the data directly with a SQL syntax and the `clip` function
+Query concepts in the `df` dataframe by name directly with SQL syntax and the `clip` function
 
 ```SQL
 SELECT *, clip(image_encoding, 'a picture of cute puppy dogs') as puppy_concept FROM df
