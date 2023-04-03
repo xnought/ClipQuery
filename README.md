@@ -13,7 +13,7 @@ cq = ClipQuery()
 images = cq.encode_images(["dog.jpg", "cat.jpg"])
 scores = cq.query(images, "a picture of a dog")
 
-# >>> scores = [0.96, 0.15]
+# >>> scores = [25, -1]
 # higher score means better match per image
 ```
 
